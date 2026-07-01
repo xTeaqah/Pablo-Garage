@@ -1,5 +1,42 @@
 # Railway setup — Pablo Garage
 
+## Postgres has no tables
+
+The database is empty until migrations run once.
+
+**Option A — Railway app shell (easiest)**
+
+1. Open your **app** service (Pablo-Garage), not Postgres
+2. Open the service **shell/terminal** (or use CLI below)
+3. Run:
+
+```bash
+npx prisma migrate deploy
+```
+
+The app service should already have `DATABASE_URL` set.
+
+**Option B — From your Mac**
+
+1. Railway → **Postgres** → **Connect** → copy `DATABASE_URL`
+2. Run:
+
+```bash
+cd "/Users/stinky/Documents/projects/Mo's Garage"
+DATABASE_URL="paste-postgres-url-here" npm run db:migrate:deploy
+```
+
+**Option C — Railway CLI**
+
+```bash
+cd "/Users/stinky/Documents/projects/Mo's Garage"
+npx @railway/cli login
+npx @railway/cli link
+npx @railway/cli run npx prisma migrate deploy
+```
+
+After migrations, redeploy the app if it is still on an old SQLite build.
+
 ## 0. Connect GitHub (required)
 
 If deploy logs still show `provider = "sqlite"` or `next start` only, Railway is not building latest `main`.
