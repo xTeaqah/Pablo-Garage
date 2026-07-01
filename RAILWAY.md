@@ -1,5 +1,16 @@
 # Railway setup — Pablo Garage
 
+## 0. Connect GitHub (required)
+
+If deploy logs still show `provider = "sqlite"` or `next start` only, Railway is not building latest `main`.
+
+1. App service → **Settings** → **Source**
+2. Connect **GitHub** → repo **`xTeaqah/Pablo-Garage`**
+3. Branch: **`main`**
+4. Save, then **Redeploy**
+
+The repo includes `railway.toml` and `nixpacks.toml` so builds run Postgres migrations automatically.
+
 ## 1. Services you need
 
 In one Railway project:
