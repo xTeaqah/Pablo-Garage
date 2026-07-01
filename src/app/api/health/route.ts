@@ -37,6 +37,11 @@ export async function GET() {
       database: "connected",
       tables: "ready",
       settingsRow: Boolean(settings),
+      deploy: {
+        commit: process.env.RAILWAY_GIT_COMMIT_SHA ?? null,
+        service: process.env.RAILWAY_SERVICE_NAME ?? null,
+        environment: process.env.RAILWAY_ENVIRONMENT_NAME ?? null,
+      },
       env: {
         databaseUrl: hasDatabaseUrl,
         authSecret: hasAuthSecret,
@@ -52,6 +57,11 @@ export async function GET() {
         ok: false,
         database: "error",
         message,
+        deploy: {
+          commit: process.env.RAILWAY_GIT_COMMIT_SHA ?? null,
+          service: process.env.RAILWAY_SERVICE_NAME ?? null,
+          environment: process.env.RAILWAY_ENVIRONMENT_NAME ?? null,
+        },
         env: {
           databaseUrl: hasDatabaseUrl,
           authSecret: hasAuthSecret,

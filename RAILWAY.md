@@ -7,9 +7,10 @@ If deploy logs still show `provider = "sqlite"` or `next start` only, Railway is
 1. App service → **Settings** → **Source**
 2. Connect **GitHub** → repo **`xTeaqah/Pablo-Garage`**
 3. Branch: **`main`**
-4. Save, then **Redeploy**
+4. **Clear custom start/build commands** in Settings → Deploy (leave blank so `Dockerfile` / `railway.toml` are used)
+5. Save, then run: `npx @railway/cli redeploy --from-source --yes`
 
-The repo includes `railway.toml` and `nixpacks.toml` so builds run Postgres migrations automatically.
+The repo includes `Dockerfile`, `railway.toml`, and `nixpacks.toml`.
 
 ## 1. Services you need
 
