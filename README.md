@@ -24,18 +24,18 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000). Sign in with your credentials from `.env`.
 
-For a local Postgres instance with Docker:
+For a local MySQL instance with Docker:
 
 ```bash
-docker run --name pablo-garage-db -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=pablo_garage -p 5432:5432 -d postgres:16
+docker run --name pablo-garage-mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=pablo_garage -p 3306:3306 -d mysql:8
 ```
 
-Then set `DATABASE_URL="postgresql://postgres:postgres@localhost:5432/pablo_garage"` in `.env`.
+Then set `DATABASE_URL="mysql://root:root@localhost:3306/pablo_garage"` in `.env`.
 
 ## Environment
 
 ```bash
-DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/DATABASE"
+DATABASE_URL="mysql://USER:PASSWORD@HOST:3306/DATABASE"
 AUTH_SECRET="..."           # openssl rand -base64 48
 ADMIN_USERNAME="Pablo"
 ADMIN_PASSWORD="..."        # remove after first setup in production
@@ -59,7 +59,7 @@ DVLA_API_KEY="..."          # optional
 
 - **Next.js 15** — App Router
 - **Tailwind CSS 4** — Mobile-first UI
-- **Prisma** — PostgreSQL
+- **Prisma** — MySQL
 - **Zod** — API validation
 - **iron-session + bcrypt** — Authentication
 

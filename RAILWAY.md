@@ -1,29 +1,27 @@
 # Railway setup — Pablo Garage
 
-## Postgres has no tables
+## MySQL has no tables
 
 The database is empty until migrations run once.
 
-**Option A — Railway app shell (easiest)**
+**Option A — Railway app shell**
 
-1. Open your **app** service (Pablo-Garage), not Postgres
-2. Open the service **shell/terminal** (or use CLI below)
+1. Open your **app** service (Pablo-Garage)
+2. Open the service **shell/terminal**
 3. Run:
 
 ```bash
 npx prisma migrate deploy
 ```
 
-The app service should already have `DATABASE_URL` set.
-
 **Option B — From your Mac**
 
-1. Railway → **Postgres** → **Connect** → copy `DATABASE_URL`
+1. Railway → **MySQL** → **Connect** → copy `MYSQL_URL`
 2. Run:
 
 ```bash
 cd "/Users/stinky/Documents/projects/Mo's Garage"
-DATABASE_URL="paste-postgres-url-here" npm run db:migrate:deploy
+DATABASE_URL="paste-mysql-url-here" npm run db:migrate:deploy
 ```
 
 **Option C — Railway CLI**
@@ -35,72 +33,43 @@ npx @railway/cli link
 npx @railway/cli run npx prisma migrate deploy
 ```
 
-After migrations, redeploy the app if it is still on an old SQLite build.
-
-## 0. Connect GitHub (required)
-
-If deploy logs still show `provider = "sqlite"` or `next start` only, Railway is not building latest `main`.
-
-1. App service → **Settings** → **Source**
-2. Connect **GitHub** → repo **`xTeaqah/Pablo-Garage`**
-3. Branch: **`main`**
-4. **Clear custom start/build commands** in Settings → Deploy (leave blank so `Dockerfile` / `railway.toml` are used)
-5. Save, then run: `npx @railway/cli redeploy --from-source --yes`
-
-The repo includes `Dockerfile`, `railway.toml`, and `nixpacks.toml`.
-
-## 1. Services you need
+## Services you need
 
 In one Railway project:
 
-- **Pablo-Garage** (or similar) — the app from GitHub
-- **Postgres** — add via **+ New** → **Database** → **PostgreSQL**
+- **Pablo-Garage** — the app from GitHub
+- **MySQL** — add via **+ New** → **Database** → **MySQL**
 
-## 2. App variables (critical)
+## App variables
 
-Open the **app service** → **Variables**. Set:
+Open the **app service** → **Variables**:
 
 ```env
-DATABASE_URL=${{Postgres.DATABASE_URL}}
+DATABASE_URL=${{MySQL.MYSQL_URL}}
 AUTH_SECRET=VMS1cb0PCe4Y2vmvwgVr7p1aBmX/Y+S40HeNMUhmJ08R6S/4skwsFNUw6Ib6dTp0
 ADMIN_USERNAME=Pablo
 ADMIN_PASSWORD=PabloMo123
 DVLA_API_KEY=RShAhpZ0w78QVIWJK1cXB6pD6stx9urO4CaCx154
 ```
 
-**Important:** `DATABASE_URL` must reference Railway Postgres — **never** use `localhost`.
+Prisma reads `DATABASE_URL`. On Railway, point it at the MySQL service URL.
 
-If your Postgres service is not named `Postgres`, check the exact name in the sidebar and use:
+If your MySQL service has a different name:
 
 ```env
-DATABASE_URL=${{YourPostgresServiceName.DATABASE_URL}}
+DATABASE_URL=${{YourMySQLServiceName.MYSQL_URL}}
 ```
 
-## 3. Build and start
+Or paste the full `mysql://...` URL from the MySQL service **Connect** tab.
 
-The repo includes `railway.toml`. After connecting GitHub, Railway should use:
+## Build and redeploy
 
-- **Build:** `npm install && npx prisma migrate deploy && npm run build`
-- **Start:** `npx prisma migrate deploy && npm start`
+The repo includes `Dockerfile` and `railway.toml`. After saving variables:
 
-If not, set these manually under the app service **Settings**.
+1. Clear any custom build/start commands in **Settings → Deploy**
+2. **Deployments** → **Redeploy** (or `npx @railway/cli redeploy --from-source --yes`)
 
-## 4. Redeploy
+## Verify
 
-After saving variables: **Deployments** → **Redeploy**.
-
-## 5. Verify
-
-1. Open `https://YOUR-APP.up.railway.app/api/health`
-   - Success: `"ok": true, "database": "connected"`
-   - Failure: shows the real database error
+1. `https://YOUR-APP.up.railway.app/api/health` → `"database": "connected"`
 2. Sign in at `/login` with `Pablo` / `PabloMo123`
-3. Remove `ADMIN_PASSWORD` from Railway variables after first login
-
-## Common mistakes
-
-| Problem | Fix |
-|---------|-----|
-| Login shows "Something went wrong" | `DATABASE_URL` still points at `localhost` |
-| Health shows `P1001` / connection refused | Postgres not attached or wrong URL |
-| Wrong password after env change | Password is stored hashed in DB; reset with new deploy + empty Settings row, or set `SEED_RESET_AUTH=true` and run seed once |

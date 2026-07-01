@@ -14,7 +14,7 @@ export async function GET() {
         ok: false,
         database: "misconfigured",
         message:
-          "DATABASE_URL points to localhost. On Railway, set DATABASE_URL=${{Postgres.DATABASE_URL}} in the app service variables.",
+          "DATABASE_URL points to localhost. On Railway, set DATABASE_URL=${{MySQL.MYSQL_URL}} in the app service variables.",
         env: {
           databaseUrl: hasDatabaseUrl,
           authSecret: hasAuthSecret,

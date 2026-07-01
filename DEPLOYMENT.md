@@ -2,13 +2,13 @@
 
 ## Before you deploy
 
-1. **PostgreSQL database** — Create a database on [Neon](https://neon.tech), [Supabase](https://supabase.com), or [Railway](https://railway.app).
+1. **MySQL database** — Create a database on [Railway](https://railway.app), [PlanetScale](https://planetscale.com), or any MySQL 8 host.
 
 2. **Set environment variables** on your host:
 
 | Variable | Required | Notes |
 |----------|----------|-------|
-| `DATABASE_URL` | Yes | Postgres connection string |
+| `DATABASE_URL` | Yes | MySQL connection string (`mysql://...`) |
 | `AUTH_SECRET` | Yes | 32+ random chars (`openssl rand -base64 48`) |
 | `ADMIN_USERNAME` | First setup | Default `Pablo` |
 | `ADMIN_PASSWORD` | First setup | Hashed on first login; remove after setup |
@@ -20,19 +20,13 @@
 npx prisma migrate deploy
 ```
 
-## Neon + Vercel notes
+## Railway MySQL
 
-If Neon gives you a pooled connection URL for `DATABASE_URL`, also add `DIRECT_URL` with the direct (non-pooler) connection string and add this to `prisma/schema.prisma`:
+On Railway, set on the app service:
 
-```prisma
-datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
-}
+```env
+DATABASE_URL=${{MySQL.MYSQL_URL}}
 ```
-
-Migrations use `DIRECT_URL`; the app uses the pooled `DATABASE_URL`.
 
 ## Local development
 
@@ -44,31 +38,33 @@ npm run db:seed   # optional
 npm run dev
 ```
 
-## Seed data
+Local Docker MySQL:
 
-Demo data for a fresh install:
+```bash
+docker run --name pablo-garage-mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=pablo_garage -p 3306:3306 -d mysql:8
+```
+
+Then set `DATABASE_URL="mysql://root:root@localhost:3306/pablo_garage"` in `.env`.
+
+## Seed data
 
 ```bash
 npm run db:seed
 ```
 
-To reset the admin password via seed (avoid on production):
+To reset admin password via seed (avoid on production):
 
 ```bash
 SEED_RESET_AUTH=true npm run db:seed
 ```
 
-## Backups
-
-Use your Postgres provider's automated backups (Neon/Supabase/Railway include these).
-
 ## Hosting options
 
 | Platform | Notes |
 |----------|-------|
-| **Vercel + Neon** | Set env vars; run `prisma migrate deploy` in build |
-| **Railway** | Attach Postgres; set env vars in dashboard |
-| **Render** | Attach Postgres volume; set env vars |
+| **Railway** | App + MySQL in one project |
+| **Vercel + PlanetScale** | Set `DATABASE_URL` to PlanetScale URL |
+| **VPS** | `npm run build && npm start` with MySQL |
 
 ## Security checklist
 
@@ -80,8 +76,6 @@ Use your Postgres provider's automated backups (Neon/Supabase/Railway include th
 
 ## Build command
 
-Most hosts can use:
-
 ```bash
 npm install && npx prisma migrate deploy && npm run build
 ```
@@ -89,5 +83,5 @@ npm install && npx prisma migrate deploy && npm run build
 Start command:
 
 ```bash
-npm start
+npx prisma migrate deploy && npm start
 ```
