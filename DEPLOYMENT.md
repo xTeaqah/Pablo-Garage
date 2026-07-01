@@ -2,42 +2,51 @@
 
 ## Before you deploy
 
-1. **Use a persistent database** — SQLite (`file:./dev.db`) is fine for local dev only. For production, use PostgreSQL (Neon, Supabase, Railway) or [Turso](https://turso.tech) (libSQL).
+1. **PostgreSQL database** — Create a database on [Neon](https://neon.tech), [Supabase](https://supabase.com), or [Railway](https://railway.app).
 
 2. **Set environment variables** on your host:
 
 | Variable | Required | Notes |
 |----------|----------|-------|
-| `DATABASE_URL` | Yes | Postgres connection string in production |
+| `DATABASE_URL` | Yes | Postgres connection string |
 | `AUTH_SECRET` | Yes | 32+ random chars (`openssl rand -base64 48`) |
 | `ADMIN_USERNAME` | First setup | Default `Pablo` |
 | `ADMIN_PASSWORD` | First setup | Hashed on first login; remove after setup |
 | `DVLA_API_KEY` | Optional | UK registration lookup |
 
-3. **Run migrations** (recommended for production):
+3. **Run migrations** during deploy:
 
 ```bash
 npx prisma migrate deploy
 ```
 
-For local development you can still use:
+## Neon + Vercel notes
 
-```bash
-npm run db:push
+If Neon gives you a pooled connection URL for `DATABASE_URL`, also add `DIRECT_URL` with the direct (non-pooler) connection string and add this to `prisma/schema.prisma`:
+
+```prisma
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
 ```
 
-## Switching to PostgreSQL
+Migrations use `DIRECT_URL`; the app uses the pooled `DATABASE_URL`.
 
-1. Change `provider` in `prisma/schema.prisma` from `sqlite` to `postgresql`.
-2. Set `DATABASE_URL` to your Postgres URL.
-3. Create and apply migrations:
+## Local development
 
 ```bash
-npx prisma migrate dev --name init
-npx prisma migrate deploy   # on production
+npm install
+cp .env.example .env
+npm run db:migrate:deploy
+npm run db:seed   # optional
+npm run dev
 ```
 
-4. Seed demo data only on a fresh install:
+## Seed data
+
+Demo data for a fresh install:
 
 ```bash
 npm run db:seed
@@ -51,16 +60,15 @@ SEED_RESET_AUTH=true npm run db:seed
 
 ## Backups
 
-- **SQLite (dev):** copy `prisma/dev.db` regularly.
-- **Postgres:** use your provider's automated backups (Neon/Supabase include these).
+Use your Postgres provider's automated backups (Neon/Supabase/Railway include these).
 
 ## Hosting options
 
 | Platform | Notes |
 |----------|-------|
-| **Vercel + Neon** | Set `DATABASE_URL`, run `prisma migrate deploy` in build |
-| **Railway / Render** | Attach Postgres volume; set env vars |
-| **VPS** | `npm run build && npm start` with persistent disk for DB |
+| **Vercel + Neon** | Set env vars; run `prisma migrate deploy` in build |
+| **Railway** | Attach Postgres; set env vars in dashboard |
+| **Render** | Attach Postgres volume; set env vars |
 
 ## Security checklist
 

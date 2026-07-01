@@ -8,8 +8,23 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: pablo_garage_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d pablo_garage_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     env:
-      DATABASE_URL: file:./ci.db
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/pablo_garage_test
       AUTH_SECRET: ci-test-secret-at-least-32-characters-long
       ADMIN_USERNAME: Pablo
       ADMIN_PASSWORD: ci-test-password-12345
@@ -24,7 +39,7 @@ jobs:
 
       - run: npm ci
 
-      - run: npx prisma db push
+      - run: npx prisma migrate deploy
 
       - run: npm test
 

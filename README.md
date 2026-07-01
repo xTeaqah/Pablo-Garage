@@ -16,18 +16,26 @@ A mobile-first garage management app for independent mechanics. Track jobs, cust
 
 ```bash
 npm install
-cp .env.example .env   # set AUTH_SECRET and ADMIN_PASSWORD
-npm run db:push
+cp .env.example .env   # set DATABASE_URL, AUTH_SECRET, and ADMIN_PASSWORD
+npm run db:migrate:deploy
 npm run db:seed        # optional demo data
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000). Sign in with your credentials from `.env`.
 
+For a local Postgres instance with Docker:
+
+```bash
+docker run --name pablo-garage-db -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=pablo_garage -p 5432:5432 -d postgres:16
+```
+
+Then set `DATABASE_URL="postgresql://postgres:postgres@localhost:5432/pablo_garage"` in `.env`.
+
 ## Environment
 
 ```bash
-DATABASE_URL="file:./dev.db"
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/DATABASE"
 AUTH_SECRET="..."           # openssl rand -base64 48
 ADMIN_USERNAME="Pablo"
 ADMIN_PASSWORD="..."        # remove after first setup in production
@@ -41,7 +49,9 @@ DVLA_API_KEY="..."          # optional
 | `npm run dev` | Development server |
 | `npm run dev:clean` | Clear `.next` cache and start dev |
 | `npm run build` | Production build |
-| `npm run db:push` | Sync schema (dev) |
+| `npm run db:migrate` | Create/apply migrations (dev) |
+| `npm run db:migrate:deploy` | Apply migrations (production/CI) |
+| `npm run db:push` | Sync schema without migrations (emergency only) |
 | `npm run db:seed` | Demo data |
 | `npm test` | Run tests |
 
@@ -49,7 +59,7 @@ DVLA_API_KEY="..."          # optional
 
 - **Next.js 15** — App Router
 - **Tailwind CSS 4** — Mobile-first UI
-- **Prisma** — SQLite (dev) / PostgreSQL (production)
+- **Prisma** — PostgreSQL
 - **Zod** — API validation
 - **iron-session + bcrypt** — Authentication
 
