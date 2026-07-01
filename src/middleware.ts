@@ -4,7 +4,7 @@ import { getIronSession } from "iron-session";
 import { getSessionOptions, type SessionData } from "@/lib/auth-session";
 
 const PUBLIC_PATHS = ["/login"];
-const PUBLIC_API_PATHS = ["/api/auth/login"];
+const PUBLIC_API_PATHS = ["/api/auth/login", "/api/health"];
 
 function isPublicPath(pathname: string): boolean {
   if (PUBLIC_PATHS.some((path) => pathname === path)) return true;
