@@ -1,0 +1,122 @@
+@import "tailwindcss";
+
+@theme {
+  --color-garage-950: #0a0c10;
+  --color-garage-900: #111318;
+  --color-garage-800: #1a1d26;
+  --color-garage-700: #252a36;
+  --color-garage-600: #353b4a;
+  --color-garage-500: #4a5163;
+  --color-garage-400: #6b7289;
+  --color-garage-300: #9ca3b8;
+  --color-garage-200: #c5cad8;
+  --color-garage-100: #e8ebf2;
+  --color-garage-50: #f4f6fa;
+
+  --color-amber-brand: #f59e0b;
+  --color-amber-brand-light: #fbbf24;
+  --color-amber-brand-dark: #d97706;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-garage-950 text-garage-100 antialiased;
+    font-family: var(--font-sans);
+  }
+
+  input, textarea, select {
+    @apply outline-none;
+  }
+}
+
+@layer utilities {
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .safe-top {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  .glass-card {
+    @apply bg-garage-800/80 backdrop-blur-sm border border-garage-700/60;
+  }
+
+  .gradient-brand {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  }
+
+  .text-gradient {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .login-atmosphere {
+    background:
+      radial-gradient(ellipse 90% 55% at 50% -15%, rgba(245, 158, 11, 0.18), transparent 55%),
+      radial-gradient(ellipse 55% 45% at 100% 85%, rgba(217, 119, 6, 0.1), transparent 50%),
+      radial-gradient(ellipse 45% 35% at 0% 70%, rgba(37, 42, 54, 0.65), transparent 50%),
+      #0a0c10;
+  }
+
+  .login-grid {
+    background-image:
+      linear-gradient(rgba(245, 158, 11, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(245, 158, 11, 0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(ellipse 75% 65% at 50% 35%, black 20%, transparent 75%);
+  }
+
+  @keyframes login-fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes login-glow-pulse {
+    0%,
+    100% {
+      opacity: 0.5;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.75;
+      transform: scale(1.04);
+    }
+  }
+
+  .login-fade-up {
+    animation: login-fade-up 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .login-fade-up-delay-1 {
+    animation: login-fade-up 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.08s forwards;
+    opacity: 0;
+  }
+
+  .login-fade-up-delay-2 {
+    animation: login-fade-up 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.16s forwards;
+    opacity: 0;
+  }
+
+  .login-glow-ring {
+    animation: login-glow-pulse 4s ease-in-out infinite;
+  }
+}

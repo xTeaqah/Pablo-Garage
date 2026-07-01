@@ -1,0 +1,188 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Settings {
+  id                 String @id @default("default")
+  businessName       String @default("Pablo Auto's")
+  address            String @default("")
+  phone              String @default("")
+  email              String @default("")
+  defaultLaborRate   Float  @default(45)
+  invoicePrefix      String @default("MG")
+  nextInvoiceNumber  Int    @default(1)
+  paymentTermsDays   Int    @default(14)
+  sortCode           String @default("")
+  accountNumber      String @default("")
+  invoiceTitle       String @default("INVOICE")
+  invoiceHeaderNote  String @default("")
+  invoicePaymentText String @default("Payment due within {days} days.")
+  invoiceBankText    String @default("BACS: Sort {sortCode} · Account {accountNumber}")
+  invoiceFooterText  String @default("Thank you for your business.\n\nNot VAT registered — no VAT has been charged.")
+  adminUsername      String @default("Pablo")
+  passwordHash       String @default("")
+}
+
+model LoginAttempt {
+  key     String   @id
+  count   Int      @default(1)
+  resetAt DateTime
+}
+
+model Customer {
+  id        String    @id @default(uuid())
+  name      String
+  phone     String
+  email     String?
+  address   String?
+  notes     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  vehicles  Vehicle[]
+  jobs      Job[]
+}
+
+model Vehicle {
+  id         String   @id @default(uuid())
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  registration String
+  make       String
+  model      String
+  year       Int?
+  mileage    Int?
+  color      String?
+  vin        String?
+  notes      String?
+  fuelType       String?
+  motStatus      String?
+  motExpiryDate  String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  jobs       Job[]
+
+  @@index([customerId])
+  @@index([registration])
+}
+
+enum JobStatus {
+  SCHEDULED
+  IN_PROGRESS
+  WAITING_PARTS
+  COMPLETE
+  INVOICED
+  PAID
+  CANCELLED
+}
+
+model Job {
+  id          String        @id @default(uuid())
+  customerId  String
+  customer    Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  vehicleId   String
+  vehicle     Vehicle       @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  description String
+  notes       String?
+  status      JobStatus     @default(SCHEDULED)
+  scheduledAt DateTime?
+  startedAt   DateTime?
+  completedAt DateTime?
+  total       Float         @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  lineItems   JobLineItem[]
+  invoice     Invoice?
+
+  @@index([customerId])
+  @@index([vehicleId])
+  @@index([status])
+  @@index([scheduledAt])
+}
+
+enum LineItemType {
+  LABOR
+  PART
+}
+
+model JobLineItem {
+  id          String       @id @default(uuid())
+  jobId       String
+  job         Job          @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  type        LineItemType
+  description String
+  quantity    Float
+  unitPrice   Float
+  lineTotal   Float
+  sortOrder   Int          @default(0)
+
+  @@index([jobId])
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+}
+
+model Invoice {
+  id            String        @id @default(uuid())
+  jobId         String        @unique
+  job           Job           @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  invoiceNumber String        @unique
+  status        InvoiceStatus @default(DRAFT)
+  issuedAt      DateTime      @default(now())
+  dueAt         DateTime
+  paidAt        DateTime?
+  subtotal      Float
+  total         Float
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([status])
+  @@index([issuedAt])
+}
+
+enum InventoryStatus {
+  IN_STOCK
+  SOLD
+}
+
+model InventoryCar {
+  id           String           @id @default(uuid())
+  registration String
+  make         String
+  model        String
+  year         Int?
+  color        String?
+  mileage      Int?
+  notes        String?
+  purchaseCost Float            @default(0)
+  purchaseDate DateTime?
+  salePrice    Float?
+  soldAt       DateTime?
+  status       InventoryStatus  @default(IN_STOCK)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  parts        InventoryPart[]
+
+  @@index([status])
+  @@index([registration])
+}
+
+model InventoryPart {
+  id             String       @id @default(uuid())
+  inventoryCarId String
+  inventoryCar   InventoryCar @relation(fields: [inventoryCarId], references: [id], onDelete: Cascade)
+  description    String
+  cost           Float
+  sortOrder      Int          @default(0)
+
+  @@index([inventoryCarId])
+}
