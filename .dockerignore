@@ -1,0 +1,14 @@
+node_modules
+.next
+.git
+.env
+.env.*
+!.env.example
+prisma/*.db
+prisma/*.db-journal
+npm-debug.log*
+.DS_Store
+coverage
+README.md
+DEPLOYMENT.md
+RAILWAY.md

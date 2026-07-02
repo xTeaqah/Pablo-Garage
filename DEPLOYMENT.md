@@ -2,65 +2,69 @@
 
 ## Before you deploy
 
-1. **Use a persistent database** — SQLite (`file:./dev.db`) is fine for local dev only. For production, use PostgreSQL (Neon, Supabase, Railway) or [Turso](https://turso.tech) (libSQL).
+1. **MySQL database** — Create a database on [Railway](https://railway.app), [PlanetScale](https://planetscale.com), or any MySQL 8 host.
 
 2. **Set environment variables** on your host:
 
 | Variable | Required | Notes |
 |----------|----------|-------|
-| `DATABASE_URL` | Yes | Postgres connection string in production |
+| `DATABASE_URL` | Yes | MySQL connection string (`mysql://...`) |
 | `AUTH_SECRET` | Yes | 32+ random chars (`openssl rand -base64 48`) |
 | `ADMIN_USERNAME` | First setup | Default `Pablo` |
 | `ADMIN_PASSWORD` | First setup | Hashed on first login; remove after setup |
 | `DVLA_API_KEY` | Optional | UK registration lookup |
 
-3. **Run migrations** (recommended for production):
+3. **Run migrations** during deploy:
 
 ```bash
 npx prisma migrate deploy
 ```
 
-For local development you can still use:
+## Railway MySQL
 
-```bash
-npm run db:push
+On Railway, set on the app service:
+
+```env
+DATABASE_URL=${{MySQL.MYSQL_URL}}
 ```
 
-## Switching to PostgreSQL
-
-1. Change `provider` in `prisma/schema.prisma` from `sqlite` to `postgresql`.
-2. Set `DATABASE_URL` to your Postgres URL.
-3. Create and apply migrations:
+## Local development
 
 ```bash
-npx prisma migrate dev --name init
-npx prisma migrate deploy   # on production
+npm install
+cp .env.example .env
+npm run db:migrate:deploy
+npm run db:seed   # optional
+npm run dev
 ```
 
-4. Seed demo data only on a fresh install:
+Local Docker MySQL:
+
+```bash
+docker run --name pablo-garage-mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=pablo_garage -p 3306:3306 -d mysql:8
+```
+
+Then set `DATABASE_URL="mysql://root:root@localhost:3306/pablo_garage"` in `.env`.
+
+## Seed data
 
 ```bash
 npm run db:seed
 ```
 
-To reset the admin password via seed (avoid on production):
+To reset admin password via seed (avoid on production):
 
 ```bash
 SEED_RESET_AUTH=true npm run db:seed
 ```
 
-## Backups
-
-- **SQLite (dev):** copy `prisma/dev.db` regularly.
-- **Postgres:** use your provider's automated backups (Neon/Supabase include these).
-
 ## Hosting options
 
 | Platform | Notes |
 |----------|-------|
-| **Vercel + Neon** | Set `DATABASE_URL`, run `prisma migrate deploy` in build |
-| **Railway / Render** | Attach Postgres volume; set env vars |
-| **VPS** | `npm run build && npm start` with persistent disk for DB |
+| **Railway** | App + MySQL in one project |
+| **Vercel + PlanetScale** | Set `DATABASE_URL` to PlanetScale URL |
+| **VPS** | `npm run build && npm start` with MySQL |
 
 ## Security checklist
 
@@ -72,8 +76,6 @@ SEED_RESET_AUTH=true npm run db:seed
 
 ## Build command
 
-Most hosts can use:
-
 ```bash
 npm install && npx prisma migrate deploy && npm run build
 ```
@@ -81,5 +83,5 @@ npm install && npx prisma migrate deploy && npm run build
 Start command:
 
 ```bash
-npm start
+npx prisma migrate deploy && npm start
 ```

@@ -8,8 +8,22 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: pablo_garage_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     env:
-      DATABASE_URL: file:./ci.db
+      DATABASE_URL: mysql://root:root@localhost:3306/pablo_garage_test
       AUTH_SECRET: ci-test-secret-at-least-32-characters-long
       ADMIN_USERNAME: Pablo
       ADMIN_PASSWORD: ci-test-password-12345
@@ -24,7 +38,7 @@ jobs:
 
       - run: npm ci
 
-      - run: npx prisma db push
+      - run: npx prisma migrate deploy
 
       - run: npm test
 
