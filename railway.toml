@@ -1,9 +1,8 @@
 [build]
-builder = "DOCKERFILE"
-buildCommand = ""
+builder = "NIXPACKS"
 
 [deploy]
-startCommand = ""
+startCommand = "npm start"
 healthcheckPath = "/login"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
