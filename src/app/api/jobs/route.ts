@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { handleApiError, jsonError } from "@/lib/api-handler";
+import { parseFormDate } from "@/lib/dates";
 import { sumMoney } from "@/lib/money";
 import {
   createJobSchema,
@@ -87,7 +88,9 @@ export async function POST(request: NextRequest) {
         description: body.description,
         notes: body.notes || null,
         status: body.status || "SCHEDULED",
-        scheduledAt: body.scheduledAt ? new Date(body.scheduledAt) : null,
+        scheduledAt: body.scheduledAt
+          ? parseFormDate(body.scheduledAt)
+          : null,
         total,
         ...(lineItems.length
           ? {

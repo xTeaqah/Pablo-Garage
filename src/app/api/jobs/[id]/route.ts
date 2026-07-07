@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { calculateDueDate, generateInvoiceNumber } from "@/lib/utils";
 import { handleApiError, jsonError } from "@/lib/api-handler";
 import { roundMoney, sumMoney } from "@/lib/money";
+import { parseFormDate } from "@/lib/dates";
 import {
   canTransitionJobStatus,
   isJobDeletable,
@@ -84,7 +85,7 @@ export async function PATCH(
     if (body.notes !== undefined) updateData.notes = body.notes;
     if (body.scheduledAt !== undefined) {
       updateData.scheduledAt = body.scheduledAt
-        ? new Date(body.scheduledAt)
+        ? parseFormDate(body.scheduledAt)
         : null;
     }
 

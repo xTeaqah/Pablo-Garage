@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { handleApiError } from "@/lib/api-handler";
 import { withInventoryTotals } from "@/lib/inventory";
 import { roundMoney } from "@/lib/money";
+import { parseFormDate } from "@/lib/dates";
 import {
   createInventorySchema,
 } from "@/lib/validations";
@@ -43,7 +44,9 @@ export async function POST(request: NextRequest) {
         mileage: body.mileage ?? null,
         notes: body.notes ?? null,
         purchaseCost: roundMoney(body.purchaseCost ?? 0),
-        purchaseDate: body.purchaseDate ? new Date(body.purchaseDate) : null,
+        purchaseDate: body.purchaseDate
+          ? parseFormDate(body.purchaseDate)
+          : null,
         ...(body.parts?.length
           ? {
               parts: {
