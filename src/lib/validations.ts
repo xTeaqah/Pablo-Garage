@@ -1,5 +1,40 @@
 import { z } from "zod";
 import { calcLineTotal, roundMoney } from "@/lib/money";
+import { isValidFormDate } from "@/lib/dates";
+
+/** YYYY-MM-DD from <input type="date"> or full ISO datetime. */
+export const optionalFormDate = z.preprocess(
+  (value) => {
+    if (value === null || value === undefined || value === "") return undefined;
+    return String(value).trim();
+  },
+  z
+    .string()
+    .refine(isValidFormDate, { message: "Invalid date." })
+    .optional()
+);
+
+export const optionalFormDateTime = z.preprocess(
+  (value) => {
+    if (value === null || value === undefined || value === "") return undefined;
+    return String(value).trim();
+  },
+  z
+    .string()
+    .refine(
+      (s) => isValidFormDate(s) || !Number.isNaN(Date.parse(s)),
+      { message: "Invalid date or time." }
+    )
+    .optional()
+);
+
+/** DVLA often omits model — default so saves don't fail. */
+export const vehicleModelField = z
+  .string()
+  .trim()
+  .optional()
+  .default("")
+  .transform((value) => value || "Unknown");
 
 const lineItemInputSchema = z.object({
   type: z.enum(["LABOR", "PART"]),
@@ -41,7 +76,7 @@ export const createJobSchema = z.object({
   description: z.string().trim().min(1, "Description is required."),
   notes: z.string().trim().optional().nullable(),
   status: jobStatusSchema.optional(),
-  scheduledAt: z.string().datetime().optional().nullable(),
+  scheduledAt: optionalFormDateTime.optional().nullable(),
   lineItems: z.array(lineItemInputSchema).optional(),
 });
 
@@ -50,7 +85,7 @@ export const patchJobSchema = z
     status: jobStatusSchema.optional(),
     description: z.string().trim().min(1).optional(),
     notes: z.string().trim().optional().nullable(),
-    scheduledAt: z.string().datetime().optional().nullable(),
+    scheduledAt: optionalFormDateTime.optional().nullable(),
     lineItems: z.array(lineItemInputSchema).optional(),
   })
   .refine((data) => Object.keys(data).length > 0, {
@@ -67,7 +102,7 @@ export const createCustomerSchema = z.object({
     .object({
       registration: z.string().trim().min(1),
       make: z.string().trim().min(1),
-      model: z.string().trim().min(1),
+      model: vehicleModelField,
       year: z.coerce.number().int().optional().nullable(),
       color: z.string().trim().optional().nullable(),
       fuelType: z.string().trim().optional().nullable(),
@@ -92,7 +127,7 @@ export const patchCustomerSchema = z
 export const createVehicleSchema = z.object({
   registration: z.string().trim().min(1),
   make: z.string().trim().min(1),
-  model: z.string().trim().min(1),
+  model: vehicleModelField,
   year: z.coerce.number().int().optional().nullable(),
   mileage: z.coerce.number().int().optional().nullable(),
   color: z.string().trim().optional().nullable(),
@@ -148,13 +183,13 @@ export const patchInvoiceSchema = z.object({
 export const createInventorySchema = z.object({
   registration: z.string().trim().min(1),
   make: z.string().trim().min(1),
-  model: z.string().trim().min(1),
+  model: vehicleModelField,
   year: z.coerce.number().int().optional().nullable(),
   color: z.string().trim().optional().nullable(),
   mileage: z.coerce.number().int().optional().nullable(),
   notes: z.string().trim().optional().nullable(),
   purchaseCost: z.coerce.number().min(0).optional(),
-  purchaseDate: z.string().datetime().optional().nullable(),
+  purchaseDate: optionalFormDate,
   parts: z
     .array(
       z.object({
@@ -175,9 +210,9 @@ export const patchInventorySchema = z
     mileage: z.coerce.number().int().optional().nullable(),
     notes: z.string().trim().optional().nullable(),
     purchaseCost: z.coerce.number().min(0).optional(),
-    purchaseDate: z.string().datetime().optional().nullable(),
+    purchaseDate: optionalFormDate,
     salePrice: z.coerce.number().min(0).optional().nullable(),
-    soldAt: z.string().datetime().optional().nullable(),
+    soldAt: optionalFormDate,
     status: z.enum(["IN_STOCK", "SOLD"]).optional(),
     parts: z
       .array(

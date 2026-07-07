@@ -15,6 +15,7 @@ import {
   InventoryPartsEditor,
   type InventoryPartLine,
 } from "@/components/inventory/InventoryPartsEditor";
+import { getApiError } from "@/lib/api";
 
 export default function NewInventoryPage() {
   const router = useRouter();
@@ -70,7 +71,9 @@ export default function NewInventoryPage() {
 
     if (!res.ok) {
       setLoading(false);
-      setError("Could not save vehicle. Please try again.");
+      setError(
+        await getApiError(res, "Could not save vehicle. Please try again.")
+      );
       return;
     }
 

@@ -13,6 +13,7 @@ import {
   SectionTitle,
 } from "@/components/ui";
 import { RegistrationLookupFields } from "@/components/vehicles/RegistrationLookupFields";
+import { getApiError } from "@/lib/api";
 
 interface Customer {
   id: string;
@@ -123,7 +124,12 @@ export default function NewJobPage() {
       }),
     });
 
-    if (!res.ok) return;
+    if (!res.ok) {
+      setCustomerError(
+        await getApiError(res, "Could not add vehicle. Please try again.")
+      );
+      return;
+    }
 
     const vehicle = await res.json();
     const updated = await fetch(`/api/customers/${customerId}`).then((r) => r.json());
@@ -165,7 +171,9 @@ export default function NewJobPage() {
       });
 
       if (!res.ok) {
-        setCustomerError("Could not create customer. Please try again.");
+        setCustomerError(
+          await getApiError(res, "Could not create customer. Please try again.")
+        );
         return;
       }
 
@@ -200,7 +208,9 @@ export default function NewJobPage() {
 
     if (!res.ok) {
       setLoading(false);
-      alert("Could not create job. Please try again.");
+      setCustomerError(
+        await getApiError(res, "Could not create job. Please try again.")
+      );
       return;
     }
 

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { handleApiError, jsonError } from "@/lib/api-handler";
 import { withInventoryTotals } from "@/lib/inventory";
 import { roundMoney } from "@/lib/money";
+import { parseFormDate } from "@/lib/dates";
 import { patchInventorySchema } from "@/lib/validations";
 
 export async function GET(
@@ -44,10 +45,12 @@ export async function PATCH(
       updateData.registration = rest.registration.toUpperCase();
     }
     if (purchaseDate !== undefined) {
-      updateData.purchaseDate = purchaseDate ? new Date(purchaseDate) : null;
+      updateData.purchaseDate = purchaseDate
+        ? parseFormDate(purchaseDate)
+        : null;
     }
     if (soldAt !== undefined) {
-      updateData.soldAt = soldAt ? new Date(soldAt) : null;
+      updateData.soldAt = soldAt ? parseFormDate(soldAt) : null;
     }
     if (salePrice !== undefined) {
       updateData.salePrice =
