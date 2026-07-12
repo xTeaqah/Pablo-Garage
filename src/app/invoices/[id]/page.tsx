@@ -7,56 +7,13 @@ import {
   Send,
   CheckCircle,
   Share2,
-  Printer,
+  FileDown,
 } from "lucide-react";
 import { PageHeader, Card, StatusBadge, Button } from "@/components/ui";
 import { InvoiceDocument } from "@/components/invoices/InvoiceDocument";
 import { formatGBP, formatDate } from "@/lib/utils";
-
-interface InvoiceDetail {
-  invoice: {
-    id: string;
-    invoiceNumber: string;
-    status: string;
-    total: number;
-    subtotal: number;
-    issuedAt: string;
-    dueAt: string;
-    paidAt: string | null;
-    job: {
-      id: string;
-      description: string;
-      customer: { name: string; phone: string; address: string | null };
-      vehicle: {
-        registration: string;
-        make: string;
-        model: string;
-        year: number | null;
-      };
-      lineItems: Array<{
-        type: string;
-        description: string;
-        quantity: number;
-        unitPrice: number;
-        lineTotal: number;
-      }>;
-    };
-  };
-  settings: {
-    businessName: string;
-    address: string;
-    phone: string;
-    email: string;
-    sortCode: string;
-    accountNumber: string;
-    paymentTermsDays: number;
-    invoiceTitle: string;
-    invoiceHeaderNote: string;
-    invoicePaymentText: string;
-    invoiceBankText: string;
-    invoiceFooterText: string;
-  };
-}
+import { openInvoicePdfExport } from "@/lib/invoice-export";
+import type { InvoiceDetail } from "./types";
 
 export default function InvoiceDetailPage({
   params,
@@ -100,8 +57,9 @@ export default function InvoiceDetailPage({
     }
   };
 
-  const handlePrint = () => {
-    window.print();
+  const handleExportPdf = () => {
+    if (!id) return;
+    openInvoicePdfExport(id);
   };
 
   if (!data) {
@@ -126,13 +84,14 @@ export default function InvoiceDetailPage({
         <StatusBadge status={invoice.status} size="md" />
       </div>
 
-      <PageHeader
-        title={invoice.invoiceNumber}
-        subtitle={invoice.job.customer.name}
-      />
+      <div className="print:hidden">
+        <PageHeader
+          title={invoice.invoiceNumber}
+          subtitle={invoice.job.customer.name}
+        />
+      </div>
 
-      <div className="px-5 space-y-5 pb-8">
-        {/* Actions */}
+      <div className="px-5 space-y-5 pb-8 print:px-0 print:pb-0">
         <div className="flex gap-2 flex-wrap print:hidden">
           {invoice.status === "DRAFT" && (
             <Button size="sm" onClick={() => updateStatus("SENT")} disabled={loading}>
@@ -146,22 +105,22 @@ export default function InvoiceDetailPage({
               Mark as Paid
             </Button>
           )}
+          <Button size="sm" variant="secondary" onClick={handleExportPdf}>
+            <FileDown className="w-3.5 h-3.5 mr-1.5" />
+            Export PDF
+          </Button>
           <Button size="sm" variant="secondary" onClick={handleShare}>
             <Share2 className="w-3.5 h-3.5 mr-1.5" />
             Share
           </Button>
-          <Button size="sm" variant="secondary" onClick={handlePrint}>
-            <Printer className="w-3.5 h-3.5 mr-1.5" />
-            Print
-          </Button>
         </div>
 
-        <div id="invoice-print">
+        <div id="invoice-print" className="print:mx-auto print:max-w-[210mm]">
           <InvoiceDocument invoice={invoice} settings={settings} />
         </div>
 
         {invoice.paidAt && (
-          <Card>
+          <Card className="print:hidden">
             <div className="flex items-center gap-2 text-emerald-400">
               <CheckCircle className="w-5 h-5" />
               <span className="font-medium">
@@ -171,31 +130,12 @@ export default function InvoiceDetailPage({
           </Card>
         )}
 
-        <Link href={`/jobs/${invoice.job.id}`}>
+        <Link href={`/jobs/${invoice.job.id}`} className="print:hidden">
           <Button variant="secondary" fullWidth size="sm">
             View Job
           </Button>
         </Link>
       </div>
-
-      <style jsx global>{`
-        @media print {
-          body {
-            background: white !important;
-            color: black !important;
-          }
-          nav, .print\\:hidden {
-            display: none !important;
-          }
-          main {
-            padding-bottom: 0 !important;
-          }
-          #invoice-print {
-            box-shadow: none !important;
-            border-radius: 0 !important;
-          }
-        }
-      `}</style>
     </div>
   );
 }

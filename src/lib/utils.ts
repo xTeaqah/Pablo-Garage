@@ -84,3 +84,24 @@ export function getGreeting(): string {
 export function cn(...classes: (string | boolean | undefined | null)[]): string {
   return classes.filter(Boolean).join(" ");
 }
+
+export function isUnknownModel(model?: string | null): boolean {
+  if (!model?.trim()) return true;
+  return model.trim().toLowerCase() === "unknown";
+}
+
+export function formatMakeModel(make: string, model?: string | null): string {
+  const trimmedMake = make.trim();
+  if (isUnknownModel(model)) return trimmedMake;
+  return `${trimmedMake} ${model!.trim()}`.trim();
+}
+
+export function formatVehicleTitle(parts: {
+  year?: number | string | null;
+  make: string;
+  model?: string | null;
+}): string {
+  return [parts.year, parts.make, isUnknownModel(parts.model) ? null : parts.model]
+    .filter(Boolean)
+    .join(" ");
+}

@@ -24,7 +24,7 @@ import {
 } from "@/components/ui";
 import { RegistrationLookupFields } from "@/components/vehicles/RegistrationLookupFields";
 import type { VehicleLookupResult } from "@/lib/registration";
-import { formatGBP, formatDate } from "@/lib/utils";
+import { formatGBP, formatDate, formatMakeModel } from "@/lib/utils";
 
 interface CustomerDetail {
   id: string;
@@ -411,7 +411,7 @@ export default function CustomerDetailPage({
                           {v.registration}
                         </p>
                         <p className="text-sm text-garage-400">
-                          {v.make} {v.model}
+                          {formatMakeModel(v.make, v.model)}
                           {v.year ? ` (${v.year})` : ""}
                         </p>
                         {v.motExpiryDate && (

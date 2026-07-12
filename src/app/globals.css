@@ -120,3 +120,52 @@
     animation: login-glow-pulse 4s ease-in-out infinite;
   }
 }
+
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm;
+  }
+
+  html,
+  body {
+    background: white !important;
+    color: black !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .app-chrome,
+  .invoice-print-toolbar,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  main {
+    padding-bottom: 0 !important;
+    max-width: none !important;
+  }
+
+  .min-h-dvh {
+    min-height: auto !important;
+  }
+
+  .max-w-lg {
+    max-width: none !important;
+  }
+
+  .invoice-print-page {
+    background: white !important;
+    padding: 0 !important;
+  }
+
+  .invoice-document {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  #invoice-print {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+}

@@ -5,7 +5,7 @@ import {
   isJobDeletable,
   isJobFinanciallyLocked,
 } from "@/lib/job-status";
-import { generateInvoiceNumber } from "@/lib/utils";
+import { generateInvoiceNumber, formatMakeModel, formatVehicleTitle } from "@/lib/utils";
 
 describe("money", () => {
   it("rounds to two decimal places", () => {
@@ -46,5 +46,23 @@ describe("invoice numbers", () => {
   it("formats with prefix, year, and padded counter", () => {
     const year = new Date().getFullYear();
     expect(generateInvoiceNumber("MG", 42)).toBe(`MG-${year}-0042`);
+  });
+});
+
+describe("vehicle labels", () => {
+  it("hides Unknown model and shows make only", () => {
+    expect(formatMakeModel("Ford", "Unknown")).toBe("Ford");
+    expect(formatMakeModel("Ford", "unknown")).toBe("Ford");
+    expect(formatMakeModel("Ford", "")).toBe("Ford");
+  });
+
+  it("shows make and model when model is known", () => {
+    expect(formatMakeModel("Ford", "Focus")).toBe("Ford Focus");
+  });
+
+  it("builds vehicle titles without Unknown model", () => {
+    expect(
+      formatVehicleTitle({ year: 2018, make: "Ford", model: "Unknown" })
+    ).toBe("2018 Ford");
   });
 });

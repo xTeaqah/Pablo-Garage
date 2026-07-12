@@ -20,7 +20,7 @@ import {
   type LineItem,
 } from "@/components/jobs/JobLineItemsEditor";
 import { ScheduleJobModal } from "@/components/jobs/ScheduleJobModal";
-import { formatGBP, formatDate, formatTime } from "@/lib/utils";
+import { formatGBP, formatDate, formatTime, formatVehicleTitle } from "@/lib/utils";
 
 interface JobDetail {
   id: string;
@@ -216,13 +216,11 @@ export default function JobDetailPage({
     );
   }
 
-  const vehicleTitle = [
-    job.vehicle.year,
-    job.vehicle.make,
-    job.vehicle.model,
-  ]
-    .filter(Boolean)
-    .join(" ");
+  const vehicleTitle = formatVehicleTitle({
+    year: job.vehicle.year,
+    make: job.vehicle.make,
+    model: job.vehicle.model,
+  });
 
   return (
     <div className="pb-8">
@@ -430,33 +428,35 @@ export default function JobDetailPage({
           </div>
         )}
 
-        {job.invoice && (
-          <Link href={`/invoices/${job.invoice.id}`}>
-            <Button variant="secondary" fullWidth size="lg">
-              <FileText className="w-4 h-4 mr-2" />
-              View Invoice {job.invoice.invoiceNumber}
-            </Button>
-          </Link>
-        )}
-
-        <div className="flex gap-3">
-          <Link href={`/customers/${job.customer.id}`} className="flex-1">
-            <Button variant="secondary" fullWidth size="sm">
-              <User className="w-4 h-4 mr-2" />
-              Customer
-            </Button>
-          </Link>
-          {!isLocked && (
-            <Button
-              variant="danger"
-              size="sm"
-              onClick={deleteJob}
-              className="flex-1"
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Delete
-            </Button>
+        <div className="flex flex-col gap-4 pt-2">
+          {job.invoice && (
+            <Link href={`/invoices/${job.invoice.id}`} className="block">
+              <Button variant="secondary" fullWidth size="lg">
+                <FileText className="w-4 h-4 mr-2" />
+                View Invoice {job.invoice.invoiceNumber}
+              </Button>
+            </Link>
           )}
+
+          <div className="flex gap-3">
+            <Link href={`/customers/${job.customer.id}`} className="flex-1">
+              <Button variant="secondary" fullWidth size="lg">
+                <User className="w-4 h-4 mr-2" />
+                Customer
+              </Button>
+            </Link>
+            {!isLocked && (
+              <Button
+                variant="danger"
+                size="lg"
+                onClick={deleteJob}
+                className="flex-1"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 

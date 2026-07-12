@@ -2,7 +2,7 @@ import Link from "next/link";
 import { format, isSameDay } from "date-fns";
 import { Clock, ChevronRight, Car } from "lucide-react";
 import { Card, StatusBadge } from "@/components/ui";
-import { formatGBP, formatTime } from "@/lib/utils";
+import { formatGBP, formatTime, formatMakeModel } from "@/lib/utils";
 
 interface JobCardProps {
   job: {
@@ -36,7 +36,7 @@ export function JobCard({ job, compact }: JobCardProps) {
             <div className="flex items-center gap-1.5 text-sm text-garage-400 mt-0.5">
               <Car className="w-3.5 h-3.5 shrink-0" />
               <span className="truncate">
-                {job.vehicle.registration} · {job.vehicle.make} {job.vehicle.model}
+                {job.vehicle.registration} · {formatMakeModel(job.vehicle.make, job.vehicle.model)}
               </span>
             </div>
             {!compact && (

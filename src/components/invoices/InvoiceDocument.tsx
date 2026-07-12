@@ -1,4 +1,5 @@
-import { formatGBP, formatDate } from "@/lib/utils";
+import Image from "next/image";
+import { formatGBP, formatDate, formatMakeModel } from "@/lib/utils";
 
 export interface InvoiceTemplateSettings {
   businessName: string;
@@ -92,23 +93,37 @@ export function InvoiceDocument({
 
   return (
     <div
-      className={`bg-white text-gray-900 rounded-2xl p-6 print:rounded-none print:shadow-none ${className}`}
+      className={`invoice-document bg-white text-gray-900 rounded-2xl p-6 sm:p-8 print:rounded-none print:shadow-none print:p-0 ${className}`}
     >
       <div className="border-b-2 border-amber-500 pb-4 mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">{settings.businessName}</h2>
-        {settings.invoiceHeaderNote && (
-          <p className="text-sm text-amber-700 font-medium mt-1">
-            {applyInvoiceTemplate(settings.invoiceHeaderNote, templateVars)}
-          </p>
-        )}
-        {settings.address && (
-          <p className="text-sm text-gray-600 mt-1 whitespace-pre-line">
-            {settings.address}
-          </p>
-        )}
-        <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600 mt-2">
-          {settings.phone && <span>Tel: {settings.phone}</span>}
-          {settings.email && <span>{settings.email}</span>}
+        <div className="flex items-start gap-4">
+          <Image
+            src="/logo.png"
+            alt=""
+            width={64}
+            height={64}
+            priority
+            className="rounded-full shrink-0 ring-1 ring-gray-200 print:ring-gray-300"
+          />
+          <div className="min-w-0 flex-1">
+            <h2 className="text-2xl font-bold text-gray-900">
+              {settings.businessName}
+            </h2>
+            {settings.invoiceHeaderNote && (
+              <p className="text-sm text-amber-700 font-medium mt-1">
+                {applyInvoiceTemplate(settings.invoiceHeaderNote, templateVars)}
+              </p>
+            )}
+            {settings.address && (
+              <p className="text-sm text-gray-600 mt-1 whitespace-pre-line">
+                {settings.address}
+              </p>
+            )}
+            <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600 mt-2">
+              {settings.phone && <span>Tel: {settings.phone}</span>}
+              {settings.email && <span>{settings.email}</span>}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -150,14 +165,14 @@ export function InvoiceDocument({
         </span>
         <span className="text-gray-600">
           {" "}
-          — {invoice.job.vehicle.make} {invoice.job.vehicle.model}
+          — {formatMakeModel(invoice.job.vehicle.make, invoice.job.vehicle.model)}
           {invoice.job.vehicle.year ? ` (${invoice.job.vehicle.year})` : ""}
         </span>
       </div>
 
-      <table className="w-full text-sm mb-6">
+      <table className="w-full text-sm mb-6 border-collapse">
         <thead>
-          <tr className="border-b-2 border-gray-200">
+          <tr className="border-b-2 border-gray-200 print:break-inside-avoid">
             <th className="text-left py-2 font-semibold text-gray-700">
               Description
             </th>
@@ -174,7 +189,7 @@ export function InvoiceDocument({
         </thead>
         <tbody>
           {invoice.job.lineItems.map((item, i) => (
-            <tr key={i} className="border-b border-gray-100">
+            <tr key={i} className="border-b border-gray-100 print:break-inside-avoid">
               <td className="py-3 text-gray-900">
                 <span className="text-xs text-gray-500 uppercase mr-2">
                   {item.type === "LABOR" ? "Labour" : "Part"}

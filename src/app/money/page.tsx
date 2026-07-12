@@ -12,7 +12,7 @@ import {
   FileText,
 } from "lucide-react";
 import { PageHeader, StatTile, SectionTitle, Card, StatusBadge, EmptyState } from "@/components/ui";
-import { formatGBP, formatDate } from "@/lib/utils";
+import { formatGBP, formatDate, formatMakeModel } from "@/lib/utils";
 
 interface InvoiceSummary {
   id: string;
@@ -279,7 +279,7 @@ export default function MoneyPage() {
                           {car.registration}
                         </p>
                         <p className="text-xs text-garage-400">
-                          {car.make} {car.model}
+                          {formatMakeModel(car.make, car.model)}
                           {car.soldAt && <> · Sold {formatDate(car.soldAt)}</>}
                         </p>
                       </div>

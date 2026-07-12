@@ -15,7 +15,7 @@ import {
   InventoryPartsEditor,
   type InventoryPartLine,
 } from "@/components/inventory/InventoryPartsEditor";
-import { formatGBP, formatDate } from "@/lib/utils";
+import { formatGBP, formatDate, formatVehicleTitle } from "@/lib/utils";
 
 interface InventoryDetail {
   id: string;
@@ -182,7 +182,11 @@ export default function InventoryDetailPage({
     );
   }
 
-  const vehicleTitle = [car.year, car.make, car.model].filter(Boolean).join(" ");
+  const vehicleTitle = formatVehicleTitle({
+    year: car.year,
+    make: car.make,
+    model: car.model,
+  });
   const livePartsCost = parts.reduce((sum, p) => sum + p.cost, 0);
   const liveTotal =
     (parseFloat(purchaseCost) || 0) + livePartsCost;

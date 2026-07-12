@@ -14,6 +14,7 @@ import {
 } from "@/components/ui";
 import { RegistrationLookupFields } from "@/components/vehicles/RegistrationLookupFields";
 import { getApiError } from "@/lib/api";
+import { formatMakeModel } from "@/lib/utils";
 
 interface Customer {
   id: string;
@@ -342,7 +343,7 @@ export default function NewJobPage() {
                     { value: "", label: "Choose a vehicle..." },
                     ...vehicles.map((v) => ({
                       value: v.id,
-                      label: `${v.registration} — ${v.make} ${v.model}`,
+                      label: `${v.registration} — ${formatMakeModel(v.make, v.model)}`,
                     })),
                   ]}
                 />

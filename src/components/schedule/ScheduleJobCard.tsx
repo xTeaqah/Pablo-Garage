@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Car, ChevronRight } from "lucide-react";
 import { StatusBadge } from "@/components/ui";
-import { formatGBP, formatTime } from "@/lib/utils";
+import { formatGBP, formatTime, formatMakeModel } from "@/lib/utils";
 
 interface ScheduleJobCardProps {
   job: {
@@ -32,7 +32,7 @@ export function ScheduleJobCard({ job }: ScheduleJobCardProps) {
           <div className="flex items-center gap-1 text-xs text-garage-400 mt-0.5">
             <Car className="w-3 h-3 shrink-0" />
             <span className="truncate">
-              {job.vehicle.registration} · {job.vehicle.make} {job.vehicle.model}
+              {job.vehicle.registration} · {formatMakeModel(job.vehicle.make, job.vehicle.model)}
             </span>
           </div>
           <p className="text-xs text-garage-300 mt-1.5 line-clamp-1">

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Car, Plus, ChevronRight } from "lucide-react";
 import { PageHeader, Card, EmptyState } from "@/components/ui";
-import { formatGBP } from "@/lib/utils";
+import { formatGBP, formatVehicleTitle } from "@/lib/utils";
 
 interface InventoryCar {
   id: string;
@@ -124,7 +124,7 @@ export default function InventoryPage() {
                         </span>
                       </div>
                       <p className="font-semibold text-white truncate">
-                        {[car.year, car.make, car.model].filter(Boolean).join(" ")}
+                        {formatVehicleTitle({ year: car.year, make: car.make, model: car.model })}
                       </p>
                       <p className="text-xs text-garage-400 mt-0.5">
                         Invested {formatGBP(car.totalCost)}

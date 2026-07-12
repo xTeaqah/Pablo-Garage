@@ -43,13 +43,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       .catch(() => {});
   }, [pathname]);
 
-  if (pathname === "/login") {
+  const isInvoicePrint = /^\/invoices\/[^/]+\/print$/.test(pathname);
+
+  if (pathname === "/login" || isInvoicePrint) {
     return <>{children}</>;
   }
 
   return (
-    <div className="min-h-dvh flex flex-col max-w-lg mx-auto relative overflow-x-hidden">
-      <header className="sticky top-0 z-40 safe-top shrink-0 bg-garage-950/95 backdrop-blur-md border-b border-garage-800/80">
+    <div className="min-h-dvh flex flex-col max-w-lg mx-auto relative overflow-x-hidden print:max-w-none">
+      <header className="app-chrome sticky top-0 z-40 safe-top shrink-0 bg-garage-950/95 backdrop-blur-md border-b border-garage-800/80 print:hidden">
         <div className="px-5 pt-3 pb-3 flex items-center justify-between gap-3">
           <Link href="/" className="flex items-center gap-2.5 min-w-0">
             <Image
@@ -71,9 +73,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      <main className="flex-1 pb-24 overflow-x-hidden">{children}</main>
+      <main className="flex-1 pb-24 overflow-x-hidden print:pb-0">{children}</main>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-50 safe-bottom">
+      <nav className="app-chrome fixed bottom-0 left-0 right-0 z-50 safe-bottom print:hidden">
         <div className="max-w-lg mx-auto px-2 pb-2">
           <div className="glass-card rounded-2xl px-1 py-1.5 flex items-center justify-around shadow-2xl shadow-black/40">
             {navItems.map((item) => {
